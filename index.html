@@ -3,394 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Compare audio quality from two different microphones side-by-side">
+    <meta name="theme-color" content="#ffffff">
     <title>Mic Comparison Tool</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-        }
-
-        .container {
-            background: white;
-            border-radius: 1rem;
-            padding: 2rem;
-            max-width: 600px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        h1 {
-            font-size: 1.75rem;
-            margin-bottom: 2rem;
-            color: #2d3748;
-            text-align: center;
-        }
-
-        .mic-selector {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #4a5568;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            background: white;
-            cursor: pointer;
-            transition: border-color 0.2s;
-        }
-
-        select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .controls {
-            display: flex;
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-
-        button {
-            flex: 1;
-            padding: 1rem;
-            border: none;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.1s, opacity 0.2s;
-        }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .record-btn {
-            background: #48bb78;
-            color: white;
-        }
-
-        .record-btn:hover:not(:disabled) {
-            background: #38a169;
-        }
-
-        .record-btn.recording {
-            background: #f56565;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .stop-btn {
-            background: #4a5568;
-            color: white;
-        }
-
-        .stop-btn:hover:not(:disabled) {
-            background: #2d3748;
-        }
-
-        .status {
-            text-align: center;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1.5rem;
-            font-weight: 500;
-        }
-
-        .status.info {
-            background: #bee3f8;
-            color: #2c5282;
-        }
-
-        .status.success {
-            background: #c6f6d5;
-            color: #22543d;
-        }
-
-        .status.error {
-            background: #fed7d7;
-            color: #742a2a;
-        }
-
-        .playback-section {
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 2px solid #e2e8f0;
-        }
-
-        .playback-item {
-            margin-bottom: 1.5rem;
-        }
-
-        .playback-item h3 {
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #4a5568;
-            margin-bottom: 0.75rem;
-        }
-
-        audio {
-            width: 100%;
-            margin-bottom: 0.5rem;
-        }
-
-        .download-btn {
-            width: 100%;
-            padding: 0.5rem;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 0.25rem;
-            cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-
-        .download-btn:hover {
-            background: #5a67d8;
-        }
-
-        .hidden {
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>🎤 Mic Comparison Tool</h1>
+    <main class="container">
+        <h1>Mic Comparison Tool</h1>
 
-        <div id="status" class="status info">
+        <div id="status" class="status status-info" role="status" aria-live="polite" aria-atomic="true">
             Select your microphones and click Record
         </div>
 
-        <div class="mic-selector">
-            <label for="mic1">Microphone 1 (e.g., EarPods)</label>
-            <select id="mic1">
-                <option value="">Select a microphone...</option>
-            </select>
+        <div id="unsupportedBrowser" class="status status-error hidden" role="alert">
+            Your browser doesn't support audio recording. Please use Chrome, Firefox, Safari, or Edge.
         </div>
 
-        <div class="mic-selector">
-            <label for="mic2">Microphone 2 (e.g., MacBook)</label>
-            <select id="mic2">
-                <option value="">Select a microphone...</option>
-            </select>
-        </div>
-
-        <div class="controls">
-            <button id="recordBtn" class="record-btn">Start Recording</button>
-            <button id="stopBtn" class="stop-btn" disabled>Stop Recording</button>
-        </div>
-
-        <div id="playbackSection" class="playback-section hidden">
-            <div class="playback-item">
-                <h3 id="mic1Label">Microphone 1</h3>
-                <audio id="audio1" controls></audio>
-                <button class="download-btn" onclick="downloadRecording(1)">Download</button>
+        <form id="micForm" aria-label="Microphone selection">
+            <div class="mic-selector">
+                <label for="mic1">First microphone</label>
+                <select id="mic1" aria-describedby="mic1-desc" required>
+                    <option value="">Select a microphone...</option>
+                </select>
+                <span id="mic1-desc" class="visually-hidden">Choose the first microphone to record from</span>
             </div>
-            <div class="playback-item">
-                <h3 id="mic2Label">Microphone 2</h3>
-                <audio id="audio2" controls></audio>
-                <button class="download-btn" onclick="downloadRecording(2)">Download</button>
-            </div>
-        </div>
-    </div>
 
+            <div class="mic-selector">
+                <label for="mic2">Second microphone</label>
+                <select id="mic2" aria-describedby="mic2-desc" required>
+                    <option value="">Select a microphone...</option>
+                </select>
+                <span id="mic2-desc" class="visually-hidden">Choose the second microphone to record from</span>
+            </div>
+        </form>
+
+        <div class="controls" role="group" aria-label="Recording controls">
+            <button id="recordBtn" class="btn btn-primary" aria-label="Start recording from both microphones" type="button">
+                Start Recording
+            </button>
+            <button id="stopBtn" class="btn btn-secondary hidden" aria-label="Stop recording" type="button">
+                Stop Recording
+            </button>
+        </div>
+
+        <div id="visualizerContainer" class="visualizer-container hidden" aria-label="Audio visualization">
+            <canvas id="waveformCanvas" class="waveform-canvas"></canvas>
+        </div>
+
+        <section id="playbackSection" class="playback-section hidden" aria-label="Recording playback">
+            <h2 class="section-title">Compare Recordings</h2>
+
+            <div class="playback-item">
+                <div class="playback-header">
+                    <h3 id="mic1Label" class="playback-title">Microphone 1</h3>
+                    <button class="btn btn-download" data-mic="1" aria-label="Download first microphone recording">
+                        <i data-lucide="download"></i>
+                    </button>
+                </div>
+                <audio id="audio1" controls aria-label="First microphone recording"></audio>
+            </div>
+
+            <div class="playback-item">
+                <div class="playback-header">
+                    <h3 id="mic2Label" class="playback-title">Microphone 2</h3>
+                    <button class="btn btn-download" data-mic="2" aria-label="Download second microphone recording">
+                        <i data-lucide="download"></i>
+                    </button>
+                </div>
+                <audio id="audio2" controls aria-label="Second microphone recording"></audio>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
     <script>
-        let mediaRecorder1 = null;
-        let mediaRecorder2 = null;
-        let recordedChunks1 = [];
-        let recordedChunks2 = [];
-        let audioBlob1 = null;
-        let audioBlob2 = null;
-
-        const mic1Select = document.getElementById('mic1');
-        const mic2Select = document.getElementById('mic2');
-        const recordBtn = document.getElementById('recordBtn');
-        const stopBtn = document.getElementById('stopBtn');
-        const statusDiv = document.getElementById('status');
-        const playbackSection = document.getElementById('playbackSection');
-
-        async function enumerateAudioDevices() {
-            try {
-                await navigator.mediaDevices.getUserMedia({ audio: true });
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const audioInputs = devices.filter(device => device.kind === 'audioinput');
-
-                audioInputs.forEach(device => {
-                    const option1 = document.createElement('option');
-                    option1.value = device.deviceId;
-                    option1.textContent = device.label || `Microphone ${device.deviceId.slice(0, 8)}`;
-                    mic1Select.appendChild(option1);
-
-                    const option2 = document.createElement('option');
-                    option2.value = device.deviceId;
-                    option2.textContent = device.label || `Microphone ${device.deviceId.slice(0, 8)}`;
-                    mic2Select.appendChild(option2);
-                });
-
-                setStatus('Microphones loaded. Ready to record!', 'success');
-            } catch (error) {
-                setStatus('Error accessing microphones. Please grant permission.', 'error');
-                console.error('Error enumerating devices:', error);
-            }
-        }
-
-        async function startRecording() {
-            const mic1Id = mic1Select.value;
-            const mic2Id = mic2Select.value;
-
-            if (!mic1Id || !mic2Id) {
-                setStatus('Please select both microphones', 'error');
-                return;
-            }
-
-            if (mic1Id === mic2Id) {
-                setStatus('Please select different microphones', 'error');
-                return;
-            }
-
-            try {
-                recordedChunks1 = [];
-                recordedChunks2 = [];
-
-                const stream1 = await navigator.mediaDevices.getUserMedia({
-                    audio: { deviceId: { exact: mic1Id } }
-                });
-
-                const stream2 = await navigator.mediaDevices.getUserMedia({
-                    audio: { deviceId: { exact: mic2Id } }
-                });
-
-                mediaRecorder1 = new MediaRecorder(stream1);
-                mediaRecorder2 = new MediaRecorder(stream2);
-
-                mediaRecorder1.ondataavailable = (event) => {
-                    if (event.data.size > 0) {
-                        recordedChunks1.push(event.data);
-                    }
-                };
-
-                mediaRecorder2.ondataavailable = (event) => {
-                    if (event.data.size > 0) {
-                        recordedChunks2.push(event.data);
-                    }
-                };
-
-                mediaRecorder1.onstop = () => {
-                    audioBlob1 = new Blob(recordedChunks1, { type: 'audio/webm' });
-                    const audioUrl1 = URL.createObjectURL(audioBlob1);
-                    document.getElementById('audio1').src = audioUrl1;
-                };
-
-                mediaRecorder2.onstop = () => {
-                    audioBlob2 = new Blob(recordedChunks2, { type: 'audio/webm' });
-                    const audioUrl2 = URL.createObjectURL(audioBlob2);
-                    document.getElementById('audio2').src = audioUrl2;
-                };
-
-                mediaRecorder1.start();
-                mediaRecorder2.start();
-
-                recordBtn.disabled = true;
-                recordBtn.classList.add('recording');
-                recordBtn.textContent = 'Recording...';
-                stopBtn.disabled = false;
-                mic1Select.disabled = true;
-                mic2Select.disabled = true;
-
-                setStatus('Recording from both microphones...', 'info');
-            } catch (error) {
-                setStatus('Error starting recording. Check microphone selection.', 'error');
-                console.error('Error starting recording:', error);
-            }
-        }
-
-        function stopRecording() {
-            if (mediaRecorder1 && mediaRecorder1.state !== 'inactive') {
-                mediaRecorder1.stop();
-                mediaRecorder1.stream.getTracks().forEach(track => track.stop());
-            }
-
-            if (mediaRecorder2 && mediaRecorder2.state !== 'inactive') {
-                mediaRecorder2.stop();
-                mediaRecorder2.stream.getTracks().forEach(track => track.stop());
-            }
-
-            recordBtn.disabled = false;
-            recordBtn.classList.remove('recording');
-            recordBtn.textContent = 'Start Recording';
-            stopBtn.disabled = true;
-            mic1Select.disabled = false;
-            mic2Select.disabled = false;
-
-            const mic1Name = mic1Select.options[mic1Select.selectedIndex].text;
-            const mic2Name = mic2Select.options[mic2Select.selectedIndex].text;
-            document.getElementById('mic1Label').textContent = mic1Name;
-            document.getElementById('mic2Label').textContent = mic2Name;
-
-            playbackSection.classList.remove('hidden');
-            setStatus('Recording complete! Compare the audio below.', 'success');
-        }
-
-        function setStatus(message, type) {
-            statusDiv.textContent = message;
-            statusDiv.className = `status ${type}`;
-        }
-
-        function downloadRecording(micNumber) {
-            const blob = micNumber === 1 ? audioBlob1 : audioBlob2;
-            const micName = micNumber === 1
-                ? mic1Select.options[mic1Select.selectedIndex].text
-                : mic2Select.options[mic2Select.selectedIndex].text;
-
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${micName.replace(/[^a-z0-9]/gi, '_')}_recording.webm`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        recordBtn.addEventListener('click', startRecording);
-        stopBtn.addEventListener('click', stopRecording);
-
-        enumerateAudioDevices();
+        lucide.createIcons();
     </script>
 </body>
 </html>
