@@ -24,6 +24,9 @@
     --color-error-bg: #fef2f2;
     --color-error-text: #991b1b;
     --color-error-border: #fca5a5;
+    --color-warning-bg: #fffbeb;
+    --color-warning-text: #92400e;
+    --color-warning-border: #fcd34d;
     --color-info-bg: #fafafa;
     --color-info-text: #0a0a0a;
     --color-info-border: #e5e5e5;
@@ -118,6 +121,27 @@ h1 {
     background: var(--color-error-bg);
     color: var(--color-error-text);
     border-color: var(--color-error-border);
+}
+
+.status-warning {
+    background: var(--color-warning-bg);
+    color: var(--color-warning-text);
+    border-color: var(--color-warning-border);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    text-align: left;
+}
+
+.hint-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: var(--color-warning-text);
+}
+
+.mobile-hint {
+    display: flex;
 }
 
 .mic-selector {
@@ -368,6 +392,10 @@ audio:focus {
         font-size: 2rem;
     }
 
+    .mobile-hint {
+        display: none;
+    }
+
     .controls {
         flex-direction: row;
         gap: var(--spacing-md);
@@ -420,6 +448,9 @@ audio:focus {
         --color-error-bg: #991b1b;
         --color-error-text: #fca5a5;
         --color-error-border: #ef4444;
+        --color-warning-bg: #78350f;
+        --color-warning-text: #fcd34d;
+        --color-warning-border: #d97706;
         --color-info-bg: #171717;
         --color-info-text: #fafafa;
         --color-info-border: #404040;
