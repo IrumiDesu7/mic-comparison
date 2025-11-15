@@ -11,14 +11,19 @@
 </head>
 <body>
     <main class="container">
-        <h1>Mic Comparison Tool</h1>
+        <h1>Microphone Comparison</h1>
 
         <div id="status" class="status status-info" role="status" aria-live="polite" aria-atomic="true">
-            Select your microphones and click Record
+            Select your microphones to begin recording
         </div>
 
         <div id="unsupportedBrowser" class="status status-error hidden" role="alert">
             Your browser doesn't support audio recording. Please use Chrome, Firefox, Safari, or Edge.
+        </div>
+
+        <div class="status status-warning mobile-hint" role="note">
+            <i data-lucide="smartphone" class="hint-icon"></i>
+            <span>Most mobile devices can only access one microphone at a time. For the best experience, please use a desktop or laptop computer.</span>
         </div>
 
         <form id="micForm" aria-label="Microphone selection">
@@ -53,7 +58,7 @@
         </div>
 
         <section id="playbackSection" class="playback-section hidden" aria-label="Recording playback">
-            <h2 class="section-title">Compare Recordings</h2>
+            <h2 class="section-title">Your Recordings</h2>
 
             <div class="playback-item">
                 <div class="playback-header">
